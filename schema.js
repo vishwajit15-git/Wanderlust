@@ -8,8 +8,9 @@ module.exports.listingSchema=Joi.object({
         location:Joi.string().required(),
         country:Joi.string().required(),
         price:Joi.number().required().min(0),  //non negative value
-        image:Joi.string().allow("",null), //allows null and undefined
-    }).required()
+        "image.url":Joi.string().allow("",null),  //this dome because we have used this format for image
+        "image.filename":Joi.string().allow("",null),
+    }).required().unknown(true)
 });
 
 module.exports.reviewSchema=Joi.object({
