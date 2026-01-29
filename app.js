@@ -5,6 +5,7 @@ const path=require("path");
 const methodOverride=require("method-override");
 const ejsMate=require("ejs-mate");
 const ExpressError=require("./utils/ExpressError.js");
+const cookieParser=require("cookie-parser");
 
 //this all are now not used here we have used them in there perspective route files ,we can removw this from here but we keep it as here for understanding
 const {listingSchema,reviewSchema}=require("./schema.js");
@@ -21,6 +22,7 @@ app.use(express.urlencoded({extended:true}));
 app.use(methodOverride("_method"));
 app.engine("ejs",ejsMate);
 app.use(express.static(path.join(__dirname,"/public")));
+app.use(cookieParser());
 
 const MONGO_URL="mongodb://127.0.0.1:27017/wanderlust";
 main()
@@ -36,7 +38,13 @@ async function main() {
 }
 
 app.get("/",(req,res)=>{
+    console.dir(req.cookies);
     res.send("HI,Iam Groot");
+});
+
+app.get("/getcookies",(req,res)=>{
+    res.cookie("greet","hello");
+    res.send("HI,Iam cookie");
 });
 
 //USE THE IMPORTED ROUTES HERE
