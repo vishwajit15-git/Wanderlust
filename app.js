@@ -47,6 +47,19 @@ app.get("/getcookies",(req,res)=>{
     res.send("HI,Iam cookie");
 });
 
+app.use(cookieParser("secretcode"));
+
+
+app.get("/getsignedcookies",(req,res)=>{
+    res.cookie("made-in","India",{signed:true});
+    res.send("signed cookie send");
+})
+
+app.get("/verified",(req,res)=>{
+    console.log(req.signedCookies);
+    res.send("Verified");
+})
+
 //USE THE IMPORTED ROUTES HERE
 app.use("/listings",listings);
 app.use("/listings/:id/reviews",reviews);
