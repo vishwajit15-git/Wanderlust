@@ -37,6 +37,7 @@ async function main() {
   await mongoose.connect(MONGO_URL);
 }
 
+//=================Cookies======================\\
 app.get("/",(req,res)=>{
     console.dir(req.cookies);
     res.send("HI,Iam Groot");
@@ -49,7 +50,6 @@ app.get("/getcookies",(req,res)=>{
 
 app.use(cookieParser("secretcode"));
 
-
 app.get("/getsignedcookies",(req,res)=>{
     res.cookie("made-in","India",{signed:true});
     res.send("signed cookie send");
@@ -60,10 +60,11 @@ app.get("/verified",(req,res)=>{
     res.send("Verified");
 })
 
+// =========================================\\
+
 //USE THE IMPORTED ROUTES HERE
 app.use("/listings",listings);
 app.use("/listings/:id/reviews",reviews);
-
 
 //To test Page not found error
 app.all(/.*/,(req,res,next)=>{
