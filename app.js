@@ -8,6 +8,9 @@ const ExpressError=require("./utils/ExpressError.js");
 const cookieParser=require("cookie-parser");
 const session=require("express-session");
 const flash=require("connect-flash");
+const passport=require("passport");
+const LocalStrategy=require("passport-local");
+const User=require("./models/user.js");
 
 //this all are now not used here we have used them in there perspective route files ,we can removw this from here but we keep it as here for understanding
 const {listingSchema,reviewSchema}=require("./schema.js");
@@ -16,8 +19,9 @@ const wrapAsync=require("./utils/wrapAsync.js");
 const Listing=require("./models/listing.js");
 
 
-const listings=require("./routes/listing.js"); //required the listing routes 
-const reviews=require("./routes/review.js"); //required the review routes 
+const listingRouter=require("./routes/listing.js"); //required the listing routes 
+const reviewRouter=require("./routes/review.js"); //required the review routes 
+const userRouter=require("./routes/user.js");  //required the user routes
 
 
 app.set("view engine","ejs");
@@ -76,16 +80,35 @@ app.get("/",(req,res)=>{
 app.use(session(sessionOptions));
 app.use(flash());
 
+//write [passport.initialize()] after session and flash middleware becoz passpoprt uses sessions for working
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 app.use((req,res,next)=>{
     res.locals.success=req.flash("success");
     res.locals.error=req.flash("error");
     next();
 });
 
+// app.get("/demoUser",async(req,res)=>{
+//     let fakeUser=new User({
+//         email:"student@gmail.com",
+//         username:"student",
+//     });
+
+//     let registeredUser=await User.register(fakeUser,"helloworld");  //this method gives password for a mentioned user here password is [helloworld]
+//     res.send(registeredUser); 
+// })
+
 
 //USE THE IMPORTED ROUTES HERE
-app.use("/listings",listings);
-app.use("/listings/:id/reviews",reviews);
+app.use("/listings",listingRouter);
+app.use("/listings/:id/reviews",reviewRouter);
+app.use("/",userRouter);
 
 //To test Page not found error
 app.all(/.*/,(req,res,next)=>{
