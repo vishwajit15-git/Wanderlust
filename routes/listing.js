@@ -2,21 +2,7 @@ const express=require("express");
 const router=express.Router();
 const Listing=require("../models/listing.js");  //we use double dots so we can access parent directory to access all these requirements
 const wrapAsync=require("../utils/wrapAsync.js");
-const {listingSchema,reviewSchema}=require("../schema.js");
-const ExpressError=require("../utils/ExpressError.js");
-const {isLoggedIn}=require("../middleware.js");
-
-//JOI Middleware
-const validateListing=(req,res,next)=>{
-    let {error}=listingSchema.validate(req.body);
-    if(error){
-        let errmsg=error.details.map((el)=>el.message).join(","); //if we want to print all errors in details object from error 
-        throw new ExpressError(400,errmsg);   // here pass errmsg instead of error;
-    }
-    else{
-        next();
-    }
-};
+const {isLoggedIn,isOwner,validateListing}=require("../middleware.js");
 
 // //Index Route 
 // router.get("/listings",wrapAsync(async(req,res)=>{
@@ -46,7 +32,6 @@ router.get("/:id",wrapAsync(async (req,res)=>{
         req.flash("error","Listing you Requested, does not exist !");
         return res.redirect("/listings");
     }
-    console.log(listing);
     res.render("listings/show.ejs",{listing});
 }));
 
@@ -61,7 +46,7 @@ router.post("/",validateListing, isLoggedIn,wrapAsync(async (req, res) => {
 
 
 //Update Route [GET ID]
-router.get("/:id/edit",isLoggedIn,wrapAsync(async (req,res)=>{
+router.get("/:id/edit",isLoggedIn,isOwner,wrapAsync(async (req,res)=>{
     let {id}=req.params;
     const listing=await Listing.findById(id);
     if(!listing){
@@ -71,7 +56,7 @@ router.get("/:id/edit",isLoggedIn,wrapAsync(async (req,res)=>{
     res.render("listings/edit.ejs",{listing});
 }));
 //Update Route [PUT ID]
-router.put("/:id",validateListing,isLoggedIn,wrapAsync(async (req,res)=>{
+router.put("/:id",validateListing,isLoggedIn,isOwner,wrapAsync(async (req,res)=>{
     let {id}=req.params;
     await Listing.findByIdAndUpdate(id,{...req.body.listing});//here it is same like we did in Creat Route [POST] but here we did it directly three dot means deconstruct the listing object
      req.flash("success","Listing Updated !")
@@ -79,7 +64,7 @@ router.put("/:id",validateListing,isLoggedIn,wrapAsync(async (req,res)=>{
 }));
 
 //DELETE ROUTE
-router.delete("/:id",isLoggedIn,wrapAsync(async (req,res)=>{
+router.delete("/:id",isLoggedIn,isOwner,wrapAsync(async (req,res)=>{
     let {id}=req.params;
     let deletedListing=await Listing.findByIdAndDelete(id); //this findByIdAndDelete() triggers the post middleware in [listing.js] models wala , 
     console.log(deletedListing);

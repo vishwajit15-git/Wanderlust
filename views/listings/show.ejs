@@ -15,19 +15,22 @@
             </div>
         </div>
         <div class="row mb-5">
-    <div class="col-6 offset-3">
-        <div class="d-flex gap-3">
 
-            <form action="/listings/<%= listing._id %>/edit" method="get">
-                <button class="btn edit-btn btn-dark action-btn">Edit</button>
-            </form>
+   
+            <div class="col-6 offset-3">
+                <div class="d-flex gap-3">
 
-            <form method="post" action="/listings/<%= listing._id %>/?_method=DELETE">
-                <button class="btn btn-dark action-btn">Delete</button>
-            </form>
+                    <form action="/listings/<%= listing._id %>/edit" method="get">
+                        <button class="btn edit-btn btn-dark action-btn">Edit</button>
+                    </form>
 
-        </div>
-    </div>
+                    <form method="post" action="/listings/<%= listing._id %>/?_method=DELETE">
+                        <button class="btn btn-dark action-btn">Delete</button>
+                    </form>
+
+                </div>
+            </div>
+         
     <div class="col-8 offset-3 mb-3">
     <hr>
         <h4>Leave a Review</h4>
