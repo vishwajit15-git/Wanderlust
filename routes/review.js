@@ -22,14 +22,10 @@ const validateReview = (req, res, next) => {
     next();
 };
 
-
-//Here the common part for the reviews is [/listings:id/reviews] remove it from this file
-
 //Reviews [POST route]
 router.post("/",isLoggedIn,validateReview,wrapAsync(reviewController.createReview));
 
 //Review DELETE ROUTE
 router.delete("/:reviewId",isLoggedIn,isReviewAuthor,wrapAsync(reviewController.deleteReview));
-
 
 module.exports=router;
