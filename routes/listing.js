@@ -4,12 +4,16 @@ const Listing=require("../models/listing.js");  //we use double dots so we can a
 const wrapAsync=require("../utils/wrapAsync.js");
 const {isLoggedIn,isOwner,validateListing}=require("../middleware.js");
 
+const multer  = require('multer');
+const {storage}=require("../cloudConfig.js");
+const upload = multer({ storage});
+
 const listingController=require("../controllers/listing.js");
 
 router
     .route("/")
     .get(wrapAsync(listingController.index))
-    .post(validateListing, isLoggedIn,wrapAsync(listingController.newListing));
+    .post(isLoggedIn,validateListing,upload.single('listing[image.url]'),wrapAsync(listingController.newListing));
 
 router.get("/new",isLoggedIn,listingController.renderNewForm);
 
