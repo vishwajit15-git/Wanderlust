@@ -4,72 +4,28 @@ const Listing=require("../models/listing.js");  //we use double dots so we can a
 const wrapAsync=require("../utils/wrapAsync.js");
 const {isLoggedIn,isOwner,validateListing}=require("../middleware.js");
 
-// //Index Route 
-// router.get("/listings",wrapAsync(async(req,res)=>{
-//     let allListings=await Listing.find({});
-//     res.render("listings/index.ejs",{allListings});
-// }));
-
-//IMP IMP IMP IMP IMP IMP IMP IMP IMP
-//AS U CAN SEE in all paths [listings] word is common so we can remove it.Check above commented INDEX ROUTE IT CONTAINS /listings but from now we will remove it in remaining all paths.
+const listingController=require("../controllers/listing.js");
 
 //Index Route 
-router.get("/",wrapAsync(async(req,res)=>{
-    let allListings=await Listing.find({});
-    res.render("listings/index.ejs",{allListings});
-}));
+router.get("/",wrapAsync(listingController.index));
 
 //Create New[GET]
-router.get("/new",isLoggedIn,(req,res)=>{
-    res.render("listings/new.ejs");
-});
+router.get("/new",isLoggedIn,listingController.renderNewForm);
 
 //Show Route (Each individual listing)
-router.get("/:id",wrapAsync(async (req,res)=>{
-    let {id}=req.params;
-    const listing=await Listing.findById(id).populate({path:"reviews",populate:{path:"author"}}).populate("owner");
-    if(!listing){
-        req.flash("error","Listing you Requested, does not exist !");
-        return res.redirect("/listings");
-    }
-    res.render("listings/show.ejs",{listing});
-}));
+router.get("/:id",wrapAsync(listingController.showListing));
 
 //Create Route[POST]
-router.post("/",validateListing, isLoggedIn,wrapAsync(async (req, res) => {
-    const newListing = new Listing(req.body.listing);
-    newListing.owner=req.user._id;
-    await newListing.save();
-    req.flash("success","New Listing Created !")
-    res.redirect("/listings");
-}));
+router.post("/",validateListing, isLoggedIn,wrapAsync(listingController.newListing));
 
 
 //Update Route [GET ID]
-router.get("/:id/edit",isLoggedIn,isOwner,wrapAsync(async (req,res)=>{
-    let {id}=req.params;
-    const listing=await Listing.findById(id);
-    if(!listing){
-        req.flash("error","Listing you Requested, does not exist !");
-        return res.redirect("/listings");
-    }
-    res.render("listings/edit.ejs",{listing});
-}));
+router.get("/:id/edit",isLoggedIn,isOwner,wrapAsync(listingController.renderEditForm));
+
 //Update Route [PUT ID]
-router.put("/:id",validateListing,isLoggedIn,isOwner,wrapAsync(async (req,res)=>{
-    let {id}=req.params;
-    await Listing.findByIdAndUpdate(id,{...req.body.listing});//here it is same like we did in Creat Route [POST] but here we did it directly three dot means deconstruct the listing object
-     req.flash("success","Listing Updated !")
-    res.redirect(`/listings/${id}`);
-}));
+router.put("/:id",validateListing,isLoggedIn,isOwner,wrapAsync(listingController.editListing));
 
 //DELETE ROUTE
-router.delete("/:id",isLoggedIn,isOwner,wrapAsync(async (req,res)=>{
-    let {id}=req.params;
-    let deletedListing=await Listing.findByIdAndDelete(id); //this findByIdAndDelete() triggers the post middleware in [listing.js] models wala , 
-    console.log(deletedListing);
-     req.flash("success","Listing Deleted !")
-    res.redirect("/listings");
-}));
+router.delete("/:id",isLoggedIn,isOwner,wrapAsync(listingController.deleteListing));
 
 module.exports=router;
