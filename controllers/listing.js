@@ -37,13 +37,24 @@ module.exports.renderEditForm=async (req,res)=>{
         req.flash("error","Listing you Requested, does not exist !");
         return res.redirect("/listings");
     }
-    res.render("listings/edit.ejs",{listing});
+
+    let originalImageUrl=listing.image.url;
+    originalImageUrl=originalImageUrl.replace("/upload","/upload/")
+    res.render("listings/edit.ejs",{listing,originalImageUrl});
 };
 
 module.exports.editListing=async (req,res)=>{
     let {id}=req.params;
-    await Listing.findByIdAndUpdate(id,{...req.body.listing});//here it is same like we did in Creat Route [POST] but here we did it directly three dot means deconstruct the listing object
-     req.flash("success","Listing Updated !")
+    let listing=await Listing.findByIdAndUpdate(id,{...req.body.listing},{new:true});//here it is same like we did in Creat Route [POST] but here we did it directly three dot means deconstruct the listing object
+    
+    if(typeof req.file !== "undefined"){
+    let url=req.file.path;
+    let filename=req.file.filename;
+    listing.image={url,filename};
+    await listing.save();
+    }
+    
+    req.flash("success","Listing Updated !")
     res.redirect(`/listings/${id}`);
 };
 
