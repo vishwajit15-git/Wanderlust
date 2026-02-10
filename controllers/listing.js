@@ -1,4 +1,5 @@
 const Listing=require("../models/listing.js");
+const axios = require("axios");
 
 module.exports.index=async(req,res)=>{
     let allListings=await Listing.find({});
@@ -20,15 +21,25 @@ module.exports.showListing=async (req,res)=>{
 };
 
 module.exports.newListing=async (req, res) => {
+        const MAP_TOKEN = process.env.MAP_TOKEN;
+
+    const location = req.body.listing.location;
+    const encodedLocation = encodeURIComponent(location);
+    const maptilerUrl = `https://api.maptiler.com/geocoding/${encodedLocation}.json?limit=1&key=${MAP_TOKEN}`;
+
+    const response = await axios.get(maptilerUrl);
+
     let url=req.file.path;
     let filename=req.file.filename;
     const newListing = new Listing(req.body.listing);
     newListing.owner=req.user._id;
     newListing.image={url,filename};
-    await newListing.save();
+    newListing.geometry = response.data.features[0].geometry;
+    let savedListing=await newListing.save();
+    console.log(savedListing);
     req.flash("success","New Listing Created !")
     res.redirect("/listings");
-};
+}
 
 module.exports.renderEditForm=async (req,res)=>{
     let {id}=req.params;
@@ -56,8 +67,7 @@ module.exports.editListing=async (req,res)=>{
     
     req.flash("success","Listing Updated !")
     res.redirect(`/listings/${id}`);
-};
-
+}
 module.exports.deleteListing=async (req,res)=>{
     let {id}=req.params;
     let deletedListing=await Listing.findByIdAndDelete(id); //this findByIdAndDelete() triggers the post middleware in [listing.js] models wala , 
