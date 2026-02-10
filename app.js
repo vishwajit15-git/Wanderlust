@@ -76,11 +76,6 @@ const sessionOptions={secret:"mysecretstring",resave:false,saveUninitialized:tru
     httpOnly:true,
 },};
 
-app.get("/",(req,res)=>{
-    console.dir(req.cookies);
-    res.send("HI,Iam Groot");
-});
-
 app.use(session(sessionOptions));
 app.use(flash());
 
