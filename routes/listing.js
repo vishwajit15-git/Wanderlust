@@ -13,7 +13,7 @@ const listingController=require("../controllers/listing.js");
 router
     .route("/")
     .get(wrapAsync(listingController.index))
-    .post(isLoggedIn,validateListing,upload.single('listing[image.url]'),wrapAsync(listingController.newListing));
+    .post(isLoggedIn,upload.single('listing[image.url]'),validateListing,wrapAsync(listingController.newListing));
 
 router.get("/new",isLoggedIn,listingController.renderNewForm);
 
