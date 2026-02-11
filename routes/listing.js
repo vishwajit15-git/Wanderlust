@@ -13,14 +13,16 @@ const listingController=require("../controllers/listing.js");
 router
     .route("/")
     .get(wrapAsync(listingController.index))
-    .post(isLoggedIn,upload.single('listing[image.url]'),validateListing,wrapAsync(listingController.newListing));
+    .post(isLoggedIn,upload.array('listing[images]',10),validateListing,wrapAsync(listingController.newListing));
+
+router.get("/search",wrapAsync(listingController.searchListings));
 
 router.get("/new",isLoggedIn,listingController.renderNewForm);
 
 router
     .route("/:id")
     .get(wrapAsync(listingController.showListing))
-    .put(validateListing,isLoggedIn,isOwner,upload.single('listing[image.url]'),wrapAsync(listingController.editListing))
+    .put(validateListing,isLoggedIn,isOwner,upload.array('listing[images]',10),wrapAsync(listingController.editListing))
     .delete(isLoggedIn,isOwner,wrapAsync(listingController.deleteListing));
 
 router.get("/:id/edit",isLoggedIn,isOwner,wrapAsync(listingController.renderEditForm));

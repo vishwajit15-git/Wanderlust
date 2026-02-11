@@ -26,6 +26,12 @@ const listingSchema = new Schema({
           : v,
     },
   },
+  images: [
+    {
+      filename: String,
+      url: String,
+    },
+  ],
   price: {
     type: Number,
   },
@@ -54,6 +60,24 @@ const listingSchema = new Schema({
     coordinates: {
       type: [Number]
     }
+  }
+});
+
+// Pre-save hook to ensure consistency between image and images
+listingSchema.pre('save', async function() {
+  // If images array exists and has items, ensure image is set to first image
+  if(this.images && this.images.length > 0 && (!this.image || !this.image.url)) {
+    this.image = {
+      filename: this.images[0].filename || 'listingimage',
+      url: this.images[0].url
+    };
+  }
+  // If image exists but images is empty, populate images with the image
+  if(this.image && this.image.url && (!this.images || this.images.length === 0)) {
+    this.images = [{
+      filename: this.image.filename || 'listingimage',
+      url: this.image.url
+    }];
   }
 });
 

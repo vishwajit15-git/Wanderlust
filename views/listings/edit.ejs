@@ -1,4 +1,93 @@
 <% layout("/layouts/boilerplate") %>
+<style>
+    .file-preview-container {
+        margin-top: 1.5rem;
+        padding: 1.5rem;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        display: none;
+        border: 2px dashed #dee2e6;
+    }
+
+    .file-preview-container.show {
+        display: block;
+    }
+
+    .file-preview-title {
+        font-weight: bold;
+        margin-bottom: 1rem;
+        color: #333;
+        font-size: 1.1rem;
+    }
+
+    .file-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .file-preview-item {
+        position: relative;
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .file-preview-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .preview-image {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .file-preview-info {
+        padding: 0.75rem;
+        background: white;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .file-preview-name {
+        font-size: 0.75rem;
+        color: #495057;
+        word-break: break-word;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    .remove-file-btn {
+        width: 100%;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 0.4rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.75rem;
+        transition: background-color 0.2s ease;
+    }
+
+    .remove-file-btn:hover {
+        background-color: #c82333;
+    }
+
+    .file-count {
+        font-size: 0.9rem;
+        color: #495057;
+        font-weight: bold;
+        padding: 0.75rem;
+        background-color: white;
+        border-radius: 6px;
+        text-align: center;
+    }
+</style>
 <div class="row mt-3">
     <div class="col-8 offset-2">
             <h2>Edit your Property details </h2>
@@ -15,13 +104,30 @@
                 </div>
 
                 <div class="mb-3">
-                    Original Listing Image <br>
-                    <img src="<%= originalImageUrl %>" style="width: 350px; height: 200px;"/>
+                    <label>Current Listing Images</label> <br>
+                    <div class="d-flex flex-wrap gap-3 mb-3">
+                        <% if(listing.images && listing.images.length > 0) { %>
+                            <% listing.images.forEach(img => { %>
+                                <img src="<%= img.url %>" style="width: 200px; height: 150px; object-fit: cover; border-radius: 8px;" alt="property-img">
+                            <% }); %>
+                        <% } else if(listing.image && listing.image.url) { %>
+                            <img src="<%= listing.image.url %>" style="width: 200px; height: 150px; object-fit: cover; border-radius: 8px;" alt="property-img">
+                        <% } %>
+                    </div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="image" class="form-label">Upload New Image</label>
-                    <input name="listing[image.url]" type="file" class="form-control">
+                    <label for="images" class="form-label">Upload New Images (Select multiple to replace)</label>
+                    <input id="imageInput" name="listing[images]" type="file" class="form-control" multiple accept="image/*">
+                    
+                    <!-- File Preview Container -->
+                    <div id="filePreviewContainer" class="file-preview-container">
+                        <div class="file-preview-title">Selected Images Preview:</div>
+                        <div class="file-preview-grid" id="previewGrid"></div>
+                        <div class="file-count">
+                            Total files: <span id="fileCount">0</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="mb-3 col-md-4">
@@ -46,3 +152,91 @@
             </form>
     </div>    
 </div>
+
+<script>
+    // Store files globally to manage removal
+    let selectedFiles = [];
+
+    const imageInput = document.getElementById('imageInput');
+    const filePreviewContainer = document.getElementById('filePreviewContainer');
+    const previewGrid = document.getElementById('previewGrid');
+    const fileCount = document.getElementById('fileCount');
+
+    // Handle file selection - accumulate files instead of replacing
+    imageInput.addEventListener('change', function() {
+        // Add new files to existing selection
+        const newFiles = Array.from(this.files);
+        selectedFiles = [...selectedFiles, ...newFiles];
+        
+        // Clear the input so user can select again
+        imageInput.value = '';
+        
+        updateFilePreview();
+    });
+
+    function updateFilePreview() {
+        previewGrid.innerHTML = '';
+
+        if (selectedFiles.length === 0) {
+            filePreviewContainer.classList.remove('show');
+            return;
+        }
+
+        filePreviewContainer.classList.add('show');
+
+        selectedFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'file-preview-item';
+                
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'preview-image';
+                img.alt = file.name;
+                
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'file-preview-info';
+                
+                const fileName = document.createElement('div');
+                fileName.className = 'file-preview-name';
+                fileName.textContent = file.name;
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-file-btn';
+                removeBtn.type = 'button';
+                removeBtn.innerHTML = '<i class="fa-solid fa-trash"></i> Remove';
+                removeBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    removeFile(index);
+                });
+                
+                infoDiv.appendChild(fileName);
+                infoDiv.appendChild(removeBtn);
+                previewItem.appendChild(img);
+                previewItem.appendChild(infoDiv);
+                previewGrid.appendChild(previewItem);
+            };
+            
+            reader.readAsDataURL(file);
+        });
+
+        fileCount.textContent = selectedFiles.length;
+        updateInputFiles();
+    }
+
+    function removeFile(index) {
+        selectedFiles.splice(index, 1);
+        updateFilePreview();
+    }
+
+    function updateInputFiles() {
+        // Create a new DataTransfer object to update the file input
+        const dataTransfer = new DataTransfer();
+        selectedFiles.forEach(file => {
+            dataTransfer.items.add(file);
+        });
+        imageInput.files = dataTransfer.files;
+    }
+</script>

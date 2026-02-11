@@ -1,14 +1,87 @@
+<style>
+    .flash-message {
+        margin: 1.5rem auto;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        animation: slideDown 0.4s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .flash-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+    }
+
+    .flash-error {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        border: none;
+    }
+
+    .flash-icon {
+        margin-right: 0.75rem;
+        font-size: 1.1rem;
+    }
+
+    .flash-message .btn-close {
+        filter: brightness(0) invert(1);
+    }
+
+    .flash-message .btn-close:hover {
+        opacity: 0.8;
+    }
+</style>
+
 <% if(success && success.length){ %> 
-    <div class="alert alert-success alert-dismissible fade show col-6 offset-3" role="alert">
+    <div class="alert alert-dismissible fade show flash-message flash-success col-md-6 col-lg-5 col-xl-4" role="alert">
+        <i class="fa-solid fa-circle-check flash-icon"></i>
         <%= success %>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 <% } %>
 
-
 <% if(error && error.length){ %> 
-    <div class="alert alert-danger alert-dismissible fade show col-6 offset-3" role="alert">
+    <div class="alert alert-dismissible fade show flash-message flash-error col-md-6 col-lg-5 col-xl-4" role="alert">
+        <i class="fa-solid fa-circle-xmark flash-icon"></i>
         <%= error %>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 <% } %>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all flash messages
+        const flashMessages = document.querySelectorAll('.flash-message');
+        
+        flashMessages.forEach(function(message) {
+            // Auto-hide after 20 seconds
+            const autoHideTimer = setTimeout(function() {
+                const alert = new bootstrap.Alert(message);
+                alert.close();
+            }, 15000);
+            
+            // Hide on click anywhere on the document
+            const clickHandler = function() {
+                clearTimeout(autoHideTimer);
+                const alert = new bootstrap.Alert(message);
+                alert.close();
+                document.removeEventListener('click', clickHandler);
+            };
+            
+            document.addEventListener('click', clickHandler);
+        });
+    });
+</script>
