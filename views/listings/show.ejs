@@ -75,7 +75,6 @@
                 <% if(listing.images && listing.images.length > 1) { %>
                     <button class="gallery-nav-btn gallery-nav-prev" onclick="changeImage(-1)">&#10094;</button>
                     <button class="gallery-nav-btn gallery-nav-next" onclick="changeImage(1)">&#10095;</button>
-                    <div class="gallery-counter"><span id="currentImg">1</span> / <span id="totalImg"><%= listing.images.length %></span></div>
                     <div class="gallery-dots" id="dotsContainer"></div>
                 <% } %>
             </div>
