@@ -67,17 +67,17 @@ module.exports.newListing=async (req, res) => {
     if(req.files && req.files.length > 0) {
         newListing.images = req.files.map(file => ({
             filename: file.filename,
-            url: file.path
+            url: file.secure_url || file.url || file.path
         }));
         // Set first image as main image
         newListing.image = {
             filename: req.files[0].filename,
-            url: req.files[0].path
+            url: req.files[0].secure_url || req.files[0].url || req.files[0].path
         };
     } else if(req.file) {
         // Fallback for single file
-        let url=req.file.path;
-        let filename=req.file.filename;
+        let url = req.file.secure_url || req.file.url || req.file.path;
+        let filename = req.file.filename;
         newListing.image={url,filename};
         newListing.images=[{url,filename}];
     }
@@ -110,16 +110,16 @@ module.exports.editListing=async (req,res)=>{
     if(req.files && req.files.length > 0) {
         listing.images = req.files.map(file => ({
             filename: file.filename,
-            url: file.path
+            url: file.secure_url || file.url || file.path
         }));
         // Set first image as main image
         listing.image = {
             filename: req.files[0].filename,
-            url: req.files[0].path
+            url: req.files[0].secure_url || req.files[0].url || req.files[0].path
         };
         await listing.save();
     } else if(typeof req.file !== "undefined"){
-        let url=req.file.path;
+        let url = req.file.secure_url || req.file.url || req.file.path;
         let filename=req.file.filename;
         listing.image={url,filename};
         listing.images=[{url,filename}];
