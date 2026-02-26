@@ -110,7 +110,7 @@
                 <div class="card col listing-card" >
                     <img src="<%= listing.images && listing.images.length > 0 ? listing.images[0].url : (listing.image && listing.image.url ? listing.image.url : 'https://unsplash.com/photos/coconut-tree-near-body-of-water-HfIex7qwTlI') %>" class="card-img-top" alt="listing_image" style="height: 20rem;" >
                         <div class="card-img-overlay">
-                            <h5 class="card-title">Card title</h5>
+                            <h5 class="card-title"><%= listing.title %></h5>
                             <p class="card-text"></p>
                             <!-- <p class="card-text"><small>Last updated 3 mins ago</small></p> -->
                         </div>
