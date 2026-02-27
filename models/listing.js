@@ -64,7 +64,7 @@ const listingSchema = new Schema({
   category: {
     type: String,
     enum: [
-      "trending",
+      "All",
       "rooms",
       "iconic-cities",
       "mountains",
