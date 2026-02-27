@@ -1,6 +1,20 @@
 <% layout("/layouts/boilerplate") %>
 
 <style>
+    .filter-link {
+        text-decoration: none;   /* removes underline */
+        color: inherit;          /* removes blue link color */
+        display: flex;           /* makes full area clickable */
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .filter-link:visited,
+    .filter-link:active,
+    .filter-link:hover {
+        text-decoration: none;
+        color: inherit;
+    }
     #filters{
         display: flex;
         flex-wrap: wrap;
@@ -77,9 +91,10 @@
     </div>
 
     <div class="filter">
-        <a href="/listings?category=amazing-pools" class="filter-link"></a>
+        <a href="/listings?category=amazing-pools" class="filter-link">
         <div><i class="fa-solid fa-person-swimming"></i></div>
         <p>Amazing Pools</p>
+        </a>
     </div>
 
     <div class="filter">
