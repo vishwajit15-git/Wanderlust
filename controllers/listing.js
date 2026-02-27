@@ -2,8 +2,11 @@ const Listing=require("../models/listing.js");
 const axios = require("axios");
 
 module.exports.index=async(req,res)=>{
-    let allListings=await Listing.find({});
-    res.render("listings/index.ejs",{allListings});
+    const { category } = req.query;
+    let filter = {};
+    if (category) filter.category = { $regex: `^${category}$`, $options: 'i' };
+    const allListings = await Listing.find(filter);
+    res.render("listings/index.ejs", { allListings, category });
 };
 
 module.exports.searchListings=async(req,res)=>{
