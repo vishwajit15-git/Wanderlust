@@ -135,19 +135,5 @@ module.exports.deleteListing=async (req,res)=>{
     console.log(deletedListing);
      req.flash("success","Listing Deleted !")
     res.redirect("/listings");
-};
 
-module.exports.filter=async(req,res)=>{
-        const { category } = req.query;
-    
-        let filter = {};
-    
-        // if category is present → filter
-        if (category) {
-          filter.category = category;
-        }
-    
-        const allListings = await Listing.find(filter);
-    
-        res.render("listings/index.ejs", { allListings, category });
-};
+};   
