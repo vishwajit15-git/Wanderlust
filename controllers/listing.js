@@ -31,7 +31,7 @@ module.exports.searchListings=async(req,res)=>{
             return res.redirect("/listings");
         }
         
-        req.flash("success",`Found ${searchListings.length} listing(s) in "${destination}"`);
+        // req.flash("success",`Found ${searchListings.length} listing(s) in "${destination}"`);
         res.render("listings/index.ejs",{allListings:searchListings});
     } catch(err){
         req.flash("error","Something went wrong with your search");
@@ -135,7 +135,6 @@ module.exports.editListing=async (req,res)=>{
 module.exports.deleteListing=async (req,res)=>{
     let {id}=req.params;
     let deletedListing=await Listing.findByIdAndDelete(id); //this findByIdAndDelete() triggers the post middleware in [listing.js] models wala , 
-    console.log(deletedListing);
      req.flash("success","Listing Deleted !")
     res.redirect("/listings");
 
