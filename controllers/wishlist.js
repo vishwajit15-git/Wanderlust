@@ -4,15 +4,15 @@ const Listing = require("../models/listing.js");
 module.exports.toggleWishlist = async (req, res) => {
     let { id } = req.params;
     let user = await User.findById(req.user._id);
+    let wishlisted;
     if (user.wishlist.some(listingId => listingId.equals(id))) {
         await User.findByIdAndUpdate(req.user._id, { $pull: { wishlist: id } });
-        req.flash("success", "Removed from Wishlist!");
+        wishlisted = false;
     } else {
         await User.findByIdAndUpdate(req.user._id, { $addToSet: { wishlist: id } });
-        req.flash("success", "Added to Wishlist!");
+        wishlisted = true;
     }
-    let redirectUrl = req.get("Referer") || "/listings";
-    res.redirect(redirectUrl);
+    res.json({ wishlisted });
 };
 
 module.exports.showWishlist = async (req, res) => {

@@ -147,15 +147,14 @@
         <%for(let listing of allListings){%>
             <div class="col" style="position:relative;">
                 <% if(currUser){ %>
-                    <form action="/wishlist/<%= listing._id %>" method="post" class="wishlist-form">
-                        <button type="submit" class="wishlist-btn">
-                            <% if(wishlist.includes(listing._id.toString())){ %>
-                                <i class="fa-solid fa-heart" style="color:#fe424d;"></i>
-                                <% } else { %>
-                                    <i class="fa-regular fa-heart"></i>
-                                    <% } %>
-                        </button>
-                    </form>
+                    <button class="wishlist-btn wishlist-form" data-id="<%= listing._id %>"
+                        onclick="toggleWishlist(event, this)">
+                        <% if(wishlist.includes(listing._id.toString())){ %>
+                            <i class="fa-solid fa-heart" style="color:#fe424d;"></i>
+                            <% } else { %>
+                                <i class="fa-regular fa-heart"></i>
+                                <% } %>
+                    </button>
                     <% } %>
                         <a href="/listings/<%= listing._id %>" class="listing-link">
                             <div class="card listing-card">
@@ -195,4 +194,28 @@
                 }
             }
         });
+    </script>
+
+    <script>
+        async function toggleWishlist(e, btn) {
+            e.preventDefault();
+            e.stopPropagation();
+            let id = btn.getAttribute("data-id");
+            try {
+                let res = await fetch("/wishlist/" + id, { method: "POST" });
+                let data = await res.json();
+                let icon = btn.querySelector("i");
+                if (data.wishlisted) {
+                    icon.className = "fa-solid fa-heart";
+                    icon.style.color = "#fe424d";
+                } else {
+                    icon.className = "fa-regular fa-heart";
+                    icon.style.color = "";
+                }
+                btn.style.transform = "scale(1.3)";
+                setTimeout(() => { btn.style.transform = "scale(1)"; }, 200);
+            } catch (err) {
+                console.log(err);
+            }
+        }
     </script>

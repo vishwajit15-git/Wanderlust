@@ -18,12 +18,11 @@
         <% } else { %>
             <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
                 <% for(let listing of wishlistListings){ %>
-                    <div class="col" style="position:relative;">
-                        <form action="/wishlist/<%= listing._id %>" method="post" class="wishlist-form">
-                            <button type="submit" class="wishlist-btn">
-                                <i class="fa-solid fa-heart" style="color:#fe424d;"></i>
-                            </button>
-                        </form>
+                    <div class="col" style="position:relative;" id="wishlist-card-<%= listing._id %>">
+                        <button class="wishlist-btn wishlist-form" data-id="<%= listing._id %>"
+                            onclick="removeFromWishlist(event, this)">
+                            <i class="fa-solid fa-heart" style="color:#fe424d;"></i>
+                        </button>
                         <a href="/listings/<%= listing._id %>" class="listing-link">
                             <div class="card listing-card">
                                 <img src="<%= listing.images && listing.images.length > 0 ? listing.images[0].url : (listing.image && listing.image.url ? listing.image.url : 'https://unsplash.com/photos/coconut-tree-near-body-of-water-HfIex7qwTlI') %>"
@@ -42,3 +41,23 @@
                     <% } %>
             </div>
             <% } %>
+
+                <script>
+                    async function removeFromWishlist(e, btn) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        let id = btn.getAttribute("data-id");
+                        try {
+                            let res = await fetch("/wishlist/" + id, { method: "POST" });
+                            let data = await res.json();
+                            if (!data.wishlisted) {
+                                let card = document.getElementById("wishlist-card-" + id);
+                                card.style.transition = "opacity 0.3s";
+                                card.style.opacity = "0";
+                                setTimeout(() => { card.remove(); }, 300);
+                            }
+                        } catch (err) {
+                            console.log(err);
+                        }
+                    }
+                </script>
