@@ -55,7 +55,26 @@
                                 let card = document.getElementById("wishlist-card-" + id);
                                 card.style.transition = "opacity 0.3s";
                                 card.style.opacity = "0";
-                                setTimeout(() => { card.remove(); }, 300);
+                                setTimeout(() => {
+                                    card.remove();
+                                    let remaining = document.querySelectorAll("[id^='wishlist-card-']");
+                                    if (remaining.length === 0) {
+                                        document.querySelector(".container").innerHTML = `
+                                            <div class="row mt-3">
+                                                <div class="col-8 offset-2">
+                                                    <h3><i class="fa-solid fa-heart" style="color:#fe424d;"></i> My Wishlist</h3>
+                                                    <hr>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-8 offset-2 text-center mt-4">
+                                                    <h5>No added destinations yet!</h5>
+                                                    <p>Start exploring and save your favorite places by clicking the <i class="fa-regular fa-heart"></i> icon.</p>
+                                                    <a href="/listings" class="btn btn-dark mt-2">Explore All Listings</a>
+                                                </div>
+                                            </div>`;
+                                    }
+                                }, 300);
                             }
                         } catch (err) {
                             console.log(err);
