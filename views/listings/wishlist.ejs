@@ -1,0 +1,44 @@
+<% layout("/layouts/boilerplate") %>
+
+    <div class="row mt-3">
+        <div class="col-8 offset-2">
+            <h3><i class="fa-solid fa-heart" style="color:#fe424d;"></i> My Wishlist</h3>
+            <hr>
+        </div>
+    </div>
+
+    <% if(wishlistListings.length===0){ %>
+        <div class="row">
+            <div class="col-8 offset-2 text-center mt-4">
+                <h5>No saved listings yet!</h5>
+                <p>Click the <i class="fa-regular fa-heart"></i> icon on any listing to save it here.</p>
+                <a href="/listings" class="btn btn-dark mt-2">Explore Listings</a>
+            </div>
+        </div>
+        <% } else { %>
+            <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
+                <% for(let listing of wishlistListings){ %>
+                    <div class="col" style="position:relative;">
+                        <form action="/wishlist/<%= listing._id %>" method="post" class="wishlist-form">
+                            <button type="submit" class="wishlist-btn">
+                                <i class="fa-solid fa-heart" style="color:#fe424d;"></i>
+                            </button>
+                        </form>
+                        <a href="/listings/<%= listing._id %>" class="listing-link">
+                            <div class="card listing-card">
+                                <img src="<%= listing.images && listing.images.length > 0 ? listing.images[0].url : (listing.image && listing.image.url ? listing.image.url : 'https://unsplash.com/photos/coconut-tree-near-body-of-water-HfIex7qwTlI') %>"
+                                    class="card-img-top" alt="listing_image" style="height: 20rem;">
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        <b>
+                                            <%= listing.title %><br>
+                                        </b>
+                                        &#8377;<%= listing.price.toLocaleString("en-IN") %>/night
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <% } %>
+            </div>
+            <% } %>
